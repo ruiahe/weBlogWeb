@@ -34,14 +34,23 @@
 export default {
   data() {
     return {
-      articleList: [
-        { id: 1, title: "hhh1", create_time: "2020-02-16" },
-        { id: 2, title: "nodejs教程", create_time: "2020-02-17" },
-        { id: 3, title: "express教程", create_time: "2020-02-18" }
-      ]
+      articleList: [],
     };
   },
+  created () {
+    this.getMyblogList()
+  },
   methods: {
+    // 获取我的博客列表
+    getMyblogList () {
+      this.$axios.post('/api/article/mylist').then(res => {
+        if (res.data.code === 0) {
+          this.articleList = res.data.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     handleAdd() {
       this.$router.push({ name: "editArticle" });
     },
@@ -59,19 +68,23 @@ export default {
         confirmButtonText: "确定",
         cacelButtonText: "取消",
         type: "warning"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: `删除${id}成功!`
-          });
+      }).then(() => {
+        this.$axios.post('/api/article/delete', {article_id: id}).then(res => {
+          console.log(res)
+          if (res.data.code === 0) {
+            this.getMyblogList()
+            this.$message({
+              type: "success",
+              message: `删除成功!`
+            });
+          }
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
+      }).catch(() => {
+        this.$message({
+          type: "info",
+          message: "已取消删除"
         });
+      });
     }
   }
 };

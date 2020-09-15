@@ -23,20 +23,67 @@ export default {
       content: ""
     };
   },
+  created () {
+    if (this.$route.params.id) {
+      this.getDetail()
+    }
+  },
   methods: {
+    getDetail () {
+      this.$axios.get('/api/article/detail', {
+        params: {
+          article_id: this.$route.params.id
+        }
+      }).then(res => {
+        if (res.data.code === 0) {
+          this.title = res.data.data.title
+          this.content = res.data.data.content
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     goBack() {
       this.$router.go(-1);
     },
-    // 新增
+    // 新增/更新
     save() {
-      this.$axios
+      if (this.$route.params.id) {
+        this.$axios
+        .post("/api/article/edit", {
+          article_id: this.$route.params.id,
+          title: this.title,
+          content: this.content
+        })
+        .then(res => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: '更新成功',
+              type: 'success'
+            })
+            setTimeout(() => {
+              this.$router.push({name: 'article'})
+            }, 1500)
+          }
+        });
+      } else {
+        this.$axios
         .post("/api/article/add", {
           title: this.title,
           content: this.content
         })
         .then(res => {
-          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: '新增成功',
+              type: 'success'
+            })
+            setTimeout(() => {
+              this.$router.push({name: 'article'})
+            }, 1500)
+          }
         });
+      }
     }
   }
 };

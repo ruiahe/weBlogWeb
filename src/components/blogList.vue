@@ -1,22 +1,36 @@
 <template>
   <div class="list">
-    <div class="card">
-      <router-link :to="'/detail/' + 1">
-        <p class="title">nodejs教程</p>
+    <div class="card" v-for="(item, index) in list" :key="index">
+      <router-link :to='"/detail/" + item.id'>
+        <p class="title">{{item.title}}</p>
       </router-link>
-      <p class="date">2020-03-20</p>
-    </div>
-    <div class="card">
-      <router-link :to="'/detail/' + 1">
-        <p class="title">nodejs教程</p>
-      </router-link>
-      <p class="date">2020-03-20</p>
+      <p class="date">{{item.create_time}}</p>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data () {
+    return {
+      list: []
+    }
+  },
+  created () {
+    this.getList()
+  },
+  methods: {
+    getList () {
+      this.$axios.post("/api/article/alllist").then(res => {
+        if (res.data.code === 0) {
+          this.list = res.data.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

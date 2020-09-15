@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
   store.commit("setToken", Cookie.get("token"));
   if (store.state.token) {
     store.commit("changeIsSignIn", 1);
-  }
+  } 
   if (to.meta.requireAuth) {
     if (store.state.token) {
       next();

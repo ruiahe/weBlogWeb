@@ -19,20 +19,18 @@ const routes = [
       },
       {
         path: "/detail/:id",
-        component: () => import("@/views/Detail.vue"),
-        meta: {
-          requireAuth: true
-        }
+        component: () => import("@/views/Detail.vue")
       },
       {
         path: "/personal",
         component: () => import("@/views/Personal.vue"),
         meta: {
-          requireAuth: true
+          requireAuth: true // 这个值判断是否需要权限
         }
       },
       {
         path: "/artical",
+        name: "article",
         component: () => import("@/views/Artical.vue"),
         meta: {
           requireAuth: true

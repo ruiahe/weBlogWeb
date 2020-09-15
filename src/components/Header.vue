@@ -46,7 +46,9 @@ export default {
     };
   },
   created() {
-    this.getUserInfo();
+    if (this.isSignIn) {
+      this.getUserInfo();
+    }
   },
   methods: {
     handleSlector(index) {
@@ -68,7 +70,6 @@ export default {
   },
   computed: {
     isSignIn() {
-      console.log(this.$store.state.isSignIn);
       return this.$store.state.isSignIn;
     }
   }

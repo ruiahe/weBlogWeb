@@ -1,13 +1,13 @@
 <template>
   <div class="blog-content-box">
     <div class="wrapper">
-      <div class="title">nodejs教程</div>
+      <div class="title">{{detail.title}}</div>
       <div class="time">
-        <div class="date"><icon className="rili"></icon>2020-03-20</div>
+        <div class="date"><icon className="rili"></icon>{{detail.create_time}}</div>
       </div>
       <div class="detail">
         <mavon-editor
-          v-model="content"
+          v-model="detail.content"
           defaultOpen="preview"
           :toolbarsFlag="false"
           :subfield="false"
@@ -23,10 +23,29 @@ import comment from "@/components/comment.vue";
 export default {
   data() {
     return {
-      content: "asdfjaisdjfoi"
+      detail: {}
     };
   },
-  components: { comment }
+  components: { comment },
+  created () {
+    this.getDetail()
+  },
+  methods: {
+    getDetail () {
+      this.$axios.get("/api/article/detail", {
+        params: {
+          article_id: this.$route.params.id
+        }
+      }).then(res => {
+        console.log(res)
+        if (res.data.code === 0) {
+          this.detail = res.data.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  }
 };
 </script>
 

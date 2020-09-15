@@ -4,64 +4,32 @@
     <div class="input-box" v-else>
       <div class="input-top">
         <div class="img">
-          <img class="avatar" src="" alt="" />
-          <p class="username">盒子</p>
+          <img class="avatar" :src="imageUrl" alt="" />
+          <p class="username">{{userInfo.nickname}}</p>
         </div>
         <div class="text">
           <textarea class="comment-content" v-model="submitText"></textarea>
         </div>
       </div>
       <div class="input-bottom">
-        <a href="javascript:void(0)" class="submit">发表评论</a>
+        <a href="javascript:void(0)" class="submit" @click="publicComment">发表评论</a>
       </div>
     </div>
     <div class="all-comment">
       <p class="title">全部评论<span class="total">4</span>条</p>
       <div class="comment-list">
-        <div class="comment-item">
+        <div class="comment-item" v-for="(item, index) in commentList" :key="index">
           <div class="item_l">
-            <img src="" alt="" class="avatar" />
-            <p class="username">阿斯顿发</p>
+            <img :src="item.head_img" alt="" class="avatar" />
+            <p class="username">{{item.nickname}}</p>
           </div>
           <div class="item_r">
             <div class="comment-content">
               <div class="comment_text">
-                阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发
+                {{item.cm_content}}
               </div>
               <div class="comment_time">
-                <div class="date">2020-10-28</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="comment-item">
-          <div class="item_l">
-            <img src="" alt="" class="avatar" />
-            <p class="username">阿斯顿发</p>
-          </div>
-          <div class="item_r">
-            <div class="comment-content">
-              <div class="comment_text">
-                阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发
-              </div>
-              <div class="comment_time">
-                <div class="date">2020-10-28</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="comment-item">
-          <div class="item_l">
-            <img src="" alt="" class="avatar" />
-            <p class="username">阿斯顿发</p>
-          </div>
-          <div class="item_r">
-            <div class="comment-content">
-              <div class="comment_text">
-                阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发阿斯顿发
-              </div>
-              <div class="comment_time">
-                <div class="date">2020-10-28</div>
+                <div class="date">{{item.create_time}}</div>
               </div>
             </div>
           </div>
@@ -75,13 +43,59 @@
 export default {
   data() {
     return {
-      submitText: ""
+      submitText: "",
+      userInfo: {},
+      imageUrl: '',
+      commentList: []
     };
   },
   computed: {
     isSignIn() {
       return this.$store.state.isSignIn;
     }
+  },
+  methods: {
+    // 发表评论
+    publicComment () {
+      this.$axios.post('/api/comment/publish', {
+        article_id: this.$route.params.id,
+        content: this.submitText
+      }).then(res => {
+        if (res.data.code === 0) {
+          this.submitText = ''
+          this.$message.success(res.data.message)
+          this.getComments()
+        }
+      })
+    },
+    // 获取评论列表
+    getComments () {
+      this.$axios.post('/api/comment/alllist', {
+        article_id: this.$route.params.id
+      }).then(res => {
+        if (res.data.code === 0) {
+          this.commentList = res.data.data
+        }
+      })
+    },
+    // 获取用户信息
+    getUserInfo () {
+      this.$axios.get("/api/user/info").then(res => {
+        let result = res.data;
+        if (result.code === 0) {
+          this.userInfo = result.data;
+          if (result.data.head_img === "" || result.data.head_img === null) {
+            this.imageUrl = require("../assets/logo.png");
+          } else {
+            this.imageUrl = result.data.head_img;
+          }
+        }
+      });
+    }
+  },
+  created () {
+    this.getUserInfo()
+    this.getComments()
   }
 };
 </script>
@@ -110,9 +124,10 @@ export default {
           width: 60px;
           height: 60px;
           border-radius: 50%;
-          border: 1px solid red;
+          border: 1px solid #333;
         }
         .username {
+          line-height:25px;
           color: #3b99fc;
           cursor: pointer;
           word-break: break-all;
@@ -133,6 +148,7 @@ export default {
       }
     }
     .input-bottom {
+      overflow:hidden;
       margin-top: 20px;
       .submit {
         float: right;

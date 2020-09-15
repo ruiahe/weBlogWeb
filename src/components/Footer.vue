@@ -10,6 +10,10 @@ export default {};
 
 <style lang="scss" scoped>
 footer {
+  position: fixed;
+  bottom:0;
+  left:0;
+  right:0;
   margin-top: 80px;
   padding: 15px 0;
   background-color: #2d2d2d;
